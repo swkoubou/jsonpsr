@@ -5,9 +5,9 @@ type Token struct {
 	Raw string
 }
 
-func NewToken(k Kind, r string) *Token {
-	return &Token{
-		k,
-		r,
-	}
-}
+//func NewToken(k Kind, r string) *Token {
+//	return &Token{
+//		k,
+//		r,
+//	}
+//}
