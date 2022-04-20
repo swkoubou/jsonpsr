@@ -3,7 +3,7 @@ package tokenizer
 type Kind int
 
 const (
-	ILLEGAL    Kind = iota
+	_          Kind = iota
 	LCUB            // {
 	RCUB            // }
 	LSQB            // [
