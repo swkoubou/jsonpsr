@@ -121,12 +121,49 @@ func TestTokenizer_Tokenize(t *testing.T) {
 				{RCUB, "}"},
 			},
 		},
+		{
+			"Array string",
+			`["hello", "bob"]`,
+			[]Token{
+				{LSQB, "["},
+				{STRING, `hello`},
+				{COMMA, ","},
+				{STRING, `bob`},
+				{RSQB, "]"},
+			},
+		},
 	}
 	tk := NewTokenizer()
 	for _, tt := range tests {
 		actual := tk.Tokenize(tt.in)
 		if !assert.Equal(t, tt.expect, actual) {
 			t.Fatalf("Test `%v` failed.", tt.name)
+		}
+	}
+}
+
+func TestToken_String(t *testing.T) {
+	tests := []struct {
+		name   string
+		in     string
+		expect []string
+	}{
+		{
+			"KV string",
+			`{`,
+			[]string{
+				"Token { Kind: LCUB, Raw: `{` }",
+			},
+		},
+	}
+	tk := NewTokenizer()
+	for _, tt := range tests {
+		actual := tk.Tokenize(tt.in)
+		assert.Equal(t, len(tt.expect), len(actual))
+		for i, str := range tt.expect {
+			if !assert.Equal(t, str, actual[i].String()) {
+				t.Fatalf("Test `%v` failed.", tt.name)
+			}
 		}
 	}
 }
