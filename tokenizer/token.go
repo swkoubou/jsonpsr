@@ -1,13 +1,12 @@
 package tokenizer
 
+import "fmt"
+
 type Token struct {
 	Kind
 	Raw string
 }
 
-//func NewToken(k Kind, r string) *Token {
-//	return &Token{
-//		k,
-//		r,
-//	}
-//}
+func (t Token) String() string {
+	return fmt.Sprintf("Token { Kind: %v, Raw: `%v` }", t.Kind.String(), t.Raw)
+}
