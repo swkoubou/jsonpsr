@@ -5,17 +5,6 @@ import (
 	"testing"
 )
 
-func TestTokenizer_Tokenize_01(t *testing.T) {
-	in := "{[]}"
-	tokenizer := NewTokenizer()
-	tokens := tokenizer.Tokenize(in)
-	tokensStr := ""
-	for _, token := range tokens {
-		tokensStr += token.Raw
-	}
-	assert.Equal(t, in, tokensStr)
-}
-
 func TestTokenizer_Tokenize(t *testing.T) {
 	tests := []struct {
 		name   string
