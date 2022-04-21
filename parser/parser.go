@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/swkoubou/jsonpsr/tokenizer"
+	"log"
 )
 
 type Parser struct {
@@ -173,9 +174,11 @@ func (p *Parser) member() *Node {
 	key := p.consume()
 	if key.Kind != tokenizer.STRING {
 		// err
+		log.Fatalf("<member> expected token.string but found %v", key.String())
 	}
 	if colon := p.consume(); colon.Kind != tokenizer.COLON {
 		// err
+		log.Fatalf("<member> expected token.colon but found %v", key.String())
 	}
 	return NewNode(
 		MEMBER,
@@ -187,12 +190,35 @@ func (p *Parser) member() *Node {
 
 func (p *Parser) array() *Node {
 	// array = "[" elements? "]"
-	return nil
+	p.goNext() // "["
+	arr := NewNode(
+		ARRAY,
+		"",
+		nil,
+		nil,
+	)
+	if p.curt().Kind != tokenizer.RSQB {
+		arr.children = NewChildren(p.elements())
+	}
+	p.goNext() // "]"
+	return arr
 }
 
 func (p *Parser) elements() *Node {
 	// elements = element ("," element)*
-	return nil
+	var elems []*Node
+	elems = append(elems, p.element())
+	for p.curt().Kind == tokenizer.COMMA {
+		p.goNext() // ","
+		elems = append(elems, p.element())
+	}
+
+	return NewNode(
+		ELEMENTS,
+		"",
+		nil,
+		elems,
+	)
 }
 
 func (p *Parser) string() *Node {
