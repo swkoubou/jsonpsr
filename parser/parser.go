@@ -25,6 +25,11 @@ func (p *Parser) prev() tokenizer.Token {
 func (p *Parser) next() tokenizer.Token {
 	return p.input[p.pos+1]
 }
+func (p *Parser) consume() tokenizer.Token {
+	t := p.curt()
+	p.goNext()
+	return t
+}
 func (p *Parser) goNext() {
 	p.pos++
 }
@@ -32,8 +37,10 @@ func (p *Parser) isEof() bool {
 	return p.pos >= len(p.input)
 }
 
-func (p *Parser) Parse() []*Node {
-	return nil
+func (p *Parser) Parse(tokens []tokenizer.Token) *Node {
+	p.input = tokens
+	p.pos = 0
+	return p.json()
 }
 
 func (p *Parser) json() *Node {
@@ -46,7 +53,33 @@ func (p *Parser) element() *Node {
 }
 func (p *Parser) value() *Node {
 	// value = object | array | string | number | "true" | "false" | "null"
-	return nil
+	switch p.curt().Kind {
+	case tokenizer.LCUB:
+		// {
+		return p.object()
+	case tokenizer.LSQB:
+		// [
+		return p.array()
+	case tokenizer.STRING:
+		return p.string()
+	case tokenizer.NUMBER:
+		return p.number()
+	case tokenizer.KEYWORD:
+		// "true", "false", "null"
+		switch p.curt().Raw {
+		case "true":
+			return p.true()
+		case "false":
+			return p.false()
+		case "null":
+			return p.null()
+		}
+	}
+	return &Node{
+		ILLEGAL,
+		nil,
+		nil,
+	}
 }
 
 func (p *Parser) object() *Node {
@@ -78,11 +111,26 @@ func (p *Parser) number() *Node {
 	return nil
 }
 func (p *Parser) true() *Node {
-	return nil
+	t := p.consume()
+	return &Node{
+		TRUE,
+		[]tokenizer.Token{t},
+		nil,
+	}
 }
 func (p *Parser) false() *Node {
-	return nil
+	t := p.consume()
+	return &Node{
+		FALSE,
+		[]tokenizer.Token{t},
+		nil,
+	}
 }
 func (p *Parser) null() *Node {
-	return nil
+	t := p.consume()
+	return &Node{
+		NULL,
+		[]tokenizer.Token{t},
+		nil,
+	}
 }
