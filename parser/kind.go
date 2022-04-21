@@ -10,6 +10,7 @@ package parser
 json syntax ebnf?
 
 json = element
+element = value
 value = object | array | string | number | "true" | "false" | "null"
 
 object = "{" members? "}"
@@ -17,9 +18,8 @@ members = member ("," member)*
 member = string ":" element
 
 array = "[" elements? "]"
-
 elements = element ("," element)*
-element = value
+
 */
 
 type Kind int
