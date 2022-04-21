@@ -137,7 +137,7 @@ func TestTokenizer_Tokenize(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if actual := tk.Tokenize(tt.in); !assert.Equal(t, tt.expect, actual) {
-				t.Errorf("Test `%v` failed.", tt.name)
+				t.Errorf("expected=%v, but actual=%v", tt.expect, actual)
 			}
 		})
 	}
@@ -164,7 +164,7 @@ func TestToken_String(t *testing.T) {
 			assert.Equal(t, len(tt.expect), len(actual))
 			for i, str := range tt.expect {
 				if !assert.Equal(t, str, actual[i].String()) {
-					t.Errorf("Test `%v` failed.", tt.name)
+					t.Errorf("expected=%v, but actual=%v", tt.expect, actual[i].String())
 				}
 			}
 		})
