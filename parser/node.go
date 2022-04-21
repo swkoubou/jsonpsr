@@ -17,9 +17,20 @@ func NewNode(kind Kind, key string, tokens []tokenizer.Token, children []*Node) 
 		children,
 	}
 }
+
 func NewChildren(children ...*Node) []*Node {
 	return children
 }
+
+func NewJsonElemValNode(children []*Node) *Node {
+	return NewNode(
+		JSON,
+		"",
+		nil,
+		NewChildren(NewElementValueNode(children)),
+	)
+}
+
 func NewElementValueNode(children []*Node) *Node {
 	return NewNode(
 		ELEMENT,
@@ -33,4 +44,59 @@ func NewElementValueNode(children []*Node) *Node {
 				children,
 			)),
 	)
+}
+
+func NewElemValString(tokens ...tokenizer.Token) *Node {
+	return NewElementValueNode(
+		NewChildren(
+			NewNode(
+				STRING,
+				"",
+				tokens,
+				nil,
+			)))
+}
+
+func NewElemValNumber(tokens ...tokenizer.Token) *Node {
+	return NewElementValueNode(
+		NewChildren(
+			NewNode(
+				NUMBER,
+				"",
+				tokens,
+				nil,
+			)))
+}
+
+func NewElemValTrue(tokens ...tokenizer.Token) *Node {
+	return NewElementValueNode(
+		NewChildren(
+			NewNode(
+				TRUE,
+				"",
+				tokens,
+				nil,
+			)))
+}
+
+func NewElemValFalse(tokens ...tokenizer.Token) *Node {
+	return NewElementValueNode(
+		NewChildren(
+			NewNode(
+				FALSE,
+				"",
+				tokens,
+				nil,
+			)))
+}
+
+func NewElemValNull(tokens ...tokenizer.Token) *Node {
+	return NewElementValueNode(
+		NewChildren(
+			NewNode(
+				NULL,
+				"",
+				tokens,
+				nil,
+			)))
 }
