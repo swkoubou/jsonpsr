@@ -22,25 +22,84 @@ func TestParser_Parse(t *testing.T) {
 			},
 			NewNode(
 				JSON,
+				"",
 				nil,
-				NewChildrenNode(
+				NewChildren(
 					NewNode(
 						ELEMENT,
+						"",
 						nil,
-						NewChildrenNode(
+						NewChildren(
 							NewNode(
-								TRUE,
-								[]tokenizer.Token{
-									{
-										tokenizer.KEYWORD,
-										"true",
-									},
-								},
+								VALUE,
+								"",
 								nil,
+								NewChildren(
+									NewNode(
+										TRUE,
+										"",
+										[]tokenizer.Token{
+											{
+												tokenizer.KEYWORD,
+												"true",
+											},
+										},
+										nil,
+									),
+								),
 							),
 						),
 					),
 				),
+			),
+		},
+		{
+			"kv string",
+			[]tokenizer.Token{
+				{tokenizer.LCUB, "{"},
+				{tokenizer.STRING, "key"},
+				{tokenizer.COLON, ":"},
+				{tokenizer.STRING, "value"},
+				{tokenizer.RCUB, "}"},
+			},
+			NewNode(
+				JSON,
+				"",
+				nil,
+				NewChildren(
+					NewElementValueNode(
+						NewChildren(
+							NewNode(
+								OBJECT,
+								"",
+								nil,
+								NewChildren(
+									NewNode(
+										MEMBERS,
+										"",
+										nil,
+										NewChildren(
+											NewNode(
+												MEMBER,
+												"key",
+												nil,
+												NewChildren(
+													NewElementValueNode(
+														NewChildren(
+															NewNode(
+																STRING,
+																"",
+																[]tokenizer.Token{
+																	{
+																		tokenizer.STRING,
+																		"value",
+																	},
+																},
+																nil,
+															)))),
+											)),
+									)),
+							)))),
 			),
 		},
 	}

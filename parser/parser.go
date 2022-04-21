@@ -1,6 +1,8 @@
 package parser
 
-import "github.com/swkoubou/jsonpsr/tokenizer"
+import (
+	"github.com/swkoubou/jsonpsr/tokenizer"
+)
 
 type Parser struct {
 	input []tokenizer.Token
@@ -47,48 +49,85 @@ func (p *Parser) json() *Node {
 	// json = element
 	return NewNode(
 		JSON,
+		"",
 		nil,
-		[]*Node{
-			p.element(),
-		},
+		NewChildren(p.element()),
 	)
 }
+
 func (p *Parser) element() *Node {
 	// element = value
-	return &Node{
-		Kind:   ELEMENT,
-		tokens: nil,
-		children: NewChildrenNode(
-			p.value(),
-		),
-	}
+	return NewNode(
+		ELEMENT,
+		"",
+		nil,
+		NewChildren(p.value()),
+	)
 }
+
 func (p *Parser) value() *Node {
 	// value = object | array | string | number | "true" | "false" | "null"
 	switch p.curt().Kind {
 	case tokenizer.LCUB:
 		// {
-		return p.object()
+		return NewNode(
+			VALUE,
+			"",
+			nil,
+			NewChildren(p.object()),
+		)
 	case tokenizer.LSQB:
 		// [
-		return p.array()
+		return NewNode(
+			VALUE,
+			"",
+			nil,
+			NewChildren(p.array()),
+		)
 	case tokenizer.STRING:
-		return p.string()
+		return NewNode(
+			VALUE,
+			"",
+			nil,
+			NewChildren(p.string()),
+		)
 	case tokenizer.NUMBER:
-		return p.number()
+		return NewNode(
+			VALUE,
+			"",
+			nil,
+			NewChildren(p.number()),
+		)
 	case tokenizer.KEYWORD:
 		// "true", "false", "null"
 		switch p.curt().Raw {
 		case "true":
-			return p.true()
+			return NewNode(
+				VALUE,
+				"",
+				nil,
+				NewChildren(p.true()),
+			)
 		case "false":
-			return p.false()
+			return NewNode(
+				VALUE,
+				"",
+				nil,
+				NewChildren(p.false()),
+			)
 		case "null":
-			return p.null()
+			return NewNode(
+				VALUE,
+				"",
+				nil,
+				NewChildren(p.null()),
+			)
 		}
 	}
+	// or panic
 	return &Node{
 		ILLEGAL,
+		"",
 		nil,
 		nil,
 	}
@@ -96,52 +135,111 @@ func (p *Parser) value() *Node {
 
 func (p *Parser) object() *Node {
 	// object = "{" members? "}"
-	return nil
+	obj := NewNode(
+		OBJECT,
+		"",
+		nil,
+		nil,
+	)
+	p.goNext() // "{"
+	if p.curt().Kind != tokenizer.RCUB {
+		// not empty
+		obj.children = NewChildren(p.members())
+	}
+	p.goNext() // "}"
+	return obj
 }
+
 func (p *Parser) members() *Node {
 	// members = member ("," member)*
-	return nil
+	var children []*Node
+	// 一個は必ずある。
+	children = append(children, p.member())
+	// ("," member)*は、0個以上なので、あるかわからない。
+	for p.curt().Kind == tokenizer.COMMA {
+		p.goNext() // ","
+		children = append(children, p.member())
+	}
+	return NewNode(
+		MEMBERS,
+		"",
+		nil,
+		children,
+	)
 }
+
 func (p *Parser) member() *Node {
 	// member = string ":" element
-	return nil
+	key := p.consume()
+	if key.Kind != tokenizer.STRING {
+		// err
+	}
+	if colon := p.consume(); colon.Kind != tokenizer.COLON {
+		// err
+	}
+	return NewNode(
+		MEMBER,
+		key.Raw,
+		nil,
+		NewChildren(p.element()),
+	)
 }
 
 func (p *Parser) array() *Node {
 	// array = "[" elements? "]"
 	return nil
 }
+
 func (p *Parser) elements() *Node {
 	// elements = element ("," element)*
 	return nil
 }
 
 func (p *Parser) string() *Node {
-	return nil
+	t := p.consume()
+	return NewNode(
+		STRING,
+		"",
+		[]tokenizer.Token{t},
+		nil,
+	)
 }
+
 func (p *Parser) number() *Node {
-	return nil
+	t := p.consume()
+	return NewNode(
+		NUMBER,
+		"",
+		[]tokenizer.Token{t},
+		nil,
+	)
 }
+
 func (p *Parser) true() *Node {
 	t := p.consume()
 	return &Node{
 		TRUE,
+		"",
 		[]tokenizer.Token{t},
 		nil,
 	}
 }
+
 func (p *Parser) false() *Node {
 	t := p.consume()
 	return &Node{
 		FALSE,
+		"",
 		[]tokenizer.Token{t},
 		nil,
 	}
 }
+
 func (p *Parser) null() *Node {
 	t := p.consume()
 	return &Node{
 		NULL,
+		"",
 		[]tokenizer.Token{t},
 		nil,
 	}
