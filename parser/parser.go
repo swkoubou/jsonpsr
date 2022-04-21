@@ -145,7 +145,7 @@ func (p *Parser) object() *Node {
 	p.goNext() // "{"
 	if p.curt().Kind != tokenizer.RCUB {
 		// not empty
-		obj.children = NewChildren(p.members())
+		obj.Children = NewChildren(p.members())
 	}
 	p.goNext() // "}"
 	return obj
@@ -198,7 +198,7 @@ func (p *Parser) array() *Node {
 		nil,
 	)
 	if p.curt().Kind != tokenizer.RSQB {
-		arr.children = NewChildren(p.elements())
+		arr.Children = NewChildren(p.elements())
 	}
 	p.goNext() // "]"
 	return arr

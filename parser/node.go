@@ -5,8 +5,8 @@ import "github.com/swkoubou/jsonpsr/tokenizer"
 type Node struct {
 	Kind
 	Key      string
-	tokens   []tokenizer.Token
-	children []*Node
+	Tokens   []tokenizer.Token
+	Children []*Node
 }
 
 func NewNode(kind Kind, key string, tokens []tokenizer.Token, children []*Node) *Node {
