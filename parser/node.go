@@ -7,3 +7,14 @@ type Node struct {
 	tokens   []tokenizer.Token
 	children []*Node
 }
+
+func NewNode(kind Kind, tokens []tokenizer.Token, children []*Node) *Node {
+	return &Node{
+		kind,
+		tokens,
+		children,
+	}
+}
+func NewChildrenNode(children ...*Node) []*Node {
+	return children
+}

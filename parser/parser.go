@@ -45,11 +45,23 @@ func (p *Parser) Parse(tokens []tokenizer.Token) *Node {
 
 func (p *Parser) json() *Node {
 	// json = element
-	return p.element()
+	return NewNode(
+		JSON,
+		nil,
+		[]*Node{
+			p.element(),
+		},
+	)
 }
 func (p *Parser) element() *Node {
 	// element = value
-	return p.value()
+	return &Node{
+		Kind:   ELEMENT,
+		tokens: nil,
+		children: NewChildrenNode(
+			p.value(),
+		),
+	}
 }
 func (p *Parser) value() *Node {
 	// value = object | array | string | number | "true" | "false" | "null"

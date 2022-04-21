@@ -20,16 +20,28 @@ func TestParser_Parse(t *testing.T) {
 					"true",
 				},
 			},
-			&Node{
-				TRUE,
-				[]tokenizer.Token{
-					{
-						tokenizer.KEYWORD,
-						"true",
-					},
-				},
+			NewNode(
+				JSON,
 				nil,
-			},
+				NewChildrenNode(
+					NewNode(
+						ELEMENT,
+						nil,
+						NewChildrenNode(
+							NewNode(
+								TRUE,
+								[]tokenizer.Token{
+									{
+										tokenizer.KEYWORD,
+										"true",
+									},
+								},
+								nil,
+							),
+						),
+					),
+				),
+			),
 		},
 	}
 
