@@ -102,6 +102,53 @@ func TestParser_Parse(t *testing.T) {
 							)))),
 			),
 		},
+		{
+			name: "kv string 2 pairs",
+			in: []tokenizer.Token{
+				{tokenizer.LCUB, "{"},
+				{tokenizer.STRING, "key1"},
+				{tokenizer.COLON, ":"},
+				{tokenizer.STRING, "value1"},
+				{tokenizer.COMMA, ","},
+				{tokenizer.STRING, "key2"},
+				{tokenizer.COLON, ":"},
+				{tokenizer.STRING, "value2"},
+				{tokenizer.RCUB, "}"},
+			},
+			expect: NewJsonElemValNode(NewChildren(NewNode(OBJECT, "", nil, NewChildren(
+				NewNode(MEMBERS, "", nil, NewChildren(
+					NewNode(MEMBER, "key1", nil, NewChildren(
+						NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "value1"}))),
+					NewNode(MEMBER, "key2", nil, NewChildren(
+						NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "value2"}))),
+				)),
+			)))),
+		},
+		{
+			name: "array: string, number, true, false, null",
+			in: []tokenizer.Token{
+				{tokenizer.LSQB, "["},
+				{tokenizer.STRING, "string"},
+				{tokenizer.COMMA, ","},
+				{tokenizer.NUMBER, "123"},
+				{tokenizer.COMMA, ","},
+				{tokenizer.KEYWORD, "true"},
+				{tokenizer.COMMA, ","},
+				{tokenizer.KEYWORD, "false"},
+				{tokenizer.COMMA, ","},
+				{tokenizer.KEYWORD, "null"},
+				{tokenizer.RSQB, "]"},
+			},
+			expect: NewJsonElemValNode(NewChildren(NewNode(ARRAY, "", nil, NewChildren(
+				NewNode(ELEMENTS, "", nil, NewChildren(
+					NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "string"}),
+					NewElemValNumber(tokenizer.Token{Kind: tokenizer.NUMBER, Raw: "123"}),
+					NewElemValTrue(tokenizer.Token{Kind: tokenizer.KEYWORD, Raw: "true"}),
+					NewElemValFalse(tokenizer.Token{Kind: tokenizer.KEYWORD, Raw: "false"}),
+					NewElemValNull(tokenizer.Token{Kind: tokenizer.KEYWORD, Raw: "null"}),
+				)),
+			)))),
+		},
 	}
 
 	psr := NewParser()
