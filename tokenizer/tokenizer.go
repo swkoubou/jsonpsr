@@ -37,6 +37,13 @@ func (t *Tokenizer) goNext() {
 	t.pos++
 }
 
+// curtとgoNextが混ざってる
+func (t *Tokenizer) consume() rune {
+	c := t.curt()
+	t.goNext()
+	return c
+}
+
 // 終端じゃないか
 func (t *Tokenizer) isEof() bool {
 	return t.pos >= len(t.input)
@@ -49,6 +56,7 @@ func (t *Tokenizer) consumeString() Token {
 	// ここから次の「"」までのデータを取得したい。
 
 	// 文字列の初めの「"」を消す。(Kind.STRINGというデータがあれば、文字列だということがわかるので。)
+	s := t.pos
 	t.goNext()
 	str := ""
 	// 「for t.curt != '"'」で回さないように注意。
@@ -77,16 +85,20 @@ func (t *Tokenizer) consumeString() Token {
 
 	// " を消費してあげて、終了
 	t.goNext()
+	e := t.pos
 
 	return Token{
 		STRING,
 		str,
+		s,
+		e,
 	}
 }
 
 // number
 func (t *Tokenizer) consumeNumber() Token {
 	num := ""
+	s := t.pos
 	for !t.isEof() {
 		c := t.curt()
 		if c == '-' || (48 <= c && c <= 57) || c == '.' {
@@ -97,9 +109,12 @@ func (t *Tokenizer) consumeNumber() Token {
 		}
 		t.goNext()
 	}
+	e := t.pos
 	return Token{
 		NUMBER,
 		num,
+		s,
+		e,
 	}
 }
 
@@ -107,6 +122,7 @@ func (t *Tokenizer) consumeNumber() Token {
 func (t *Tokenizer) consumeKeyword() Token {
 	// 使用できる文字は、アルファベットのみ
 	keyword := ""
+	s := t.pos
 	for !t.isEof() {
 		c := t.curt()
 		if (65 <= c && c <= 90) || (97 <= c && c <= 122) {
@@ -117,15 +133,19 @@ func (t *Tokenizer) consumeKeyword() Token {
 		}
 		t.goNext()
 	}
+	e := t.pos
 	return Token{
 		KEYWORD,
 		keyword,
+		s,
+		e,
 	}
 }
 
 // whitespace
 func (t *Tokenizer) consumeWhiteSpace() Token {
 	white := ""
+	s := t.pos
 	for !t.isEof() {
 		c := t.curt()
 		if unicode.IsSpace(c) {
@@ -136,9 +156,12 @@ func (t *Tokenizer) consumeWhiteSpace() Token {
 		}
 		t.goNext()
 	}
+	e := t.pos
 	return Token{
 		WHITESPACE,
 		white,
+		s,
+		e,
 	}
 }
 
@@ -153,23 +176,35 @@ func (t *Tokenizer) Tokenize(in string) []Token {
 	for !t.isEof() {
 		switch {
 		case t.curt() == '{':
-			tok = Token{LCUB, string(t.curt())}
-			t.goNext()
+			s := t.pos
+			c := t.consume()
+			e := t.pos
+			tok = Token{LCUB, string(c), s, e}
 		case t.curt() == '}':
-			tok = Token{RCUB, string(t.curt())}
-			t.goNext()
+			s := t.pos
+			c := t.consume()
+			e := t.pos
+			tok = Token{RCUB, string(c), s, e}
 		case t.curt() == '[':
-			tok = Token{LSQB, string(t.curt())}
-			t.goNext()
+			s := t.pos
+			c := t.consume()
+			e := t.pos
+			tok = Token{LSQB, string(c), s, e}
 		case t.curt() == ']':
-			tok = Token{RSQB, string(t.curt())}
-			t.goNext()
+			s := t.pos
+			c := t.consume()
+			e := t.pos
+			tok = Token{RSQB, string(c), s, e}
 		case t.curt() == ':':
-			tok = Token{COLON, string(t.curt())}
-			t.goNext()
+			s := t.pos
+			c := t.consume()
+			e := t.pos
+			tok = Token{COLON, string(c), s, e}
 		case t.curt() == ',':
-			tok = Token{COMMA, string(t.curt())}
-			t.goNext()
+			s := t.pos
+			c := t.consume()
+			e := t.pos
+			tok = Token{COMMA, string(c), s, e}
 		case t.curt() == '"':
 			// "abc"のように、「"」から始まるものは、基本的に文字列、string。
 			tok = t.consumeString()
