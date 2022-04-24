@@ -13,14 +13,16 @@ func TestParser_Parse(t *testing.T) {
 		expect *Node
 	}{
 		{
-			"only true",
-			[]tokenizer.Token{
+			name: "only true",
+			in: []tokenizer.Token{
 				{
 					tokenizer.KEYWORD,
 					"true",
+					0,
+					5,
 				},
 			},
-			NewNode(
+			expect: NewNode(
 				JSON,
 				"",
 				nil,
@@ -42,6 +44,8 @@ func TestParser_Parse(t *testing.T) {
 											{
 												tokenizer.KEYWORD,
 												"true",
+												0,
+												5,
 											},
 										},
 										nil,
@@ -56,11 +60,11 @@ func TestParser_Parse(t *testing.T) {
 		{
 			"kv string",
 			[]tokenizer.Token{
-				{tokenizer.LCUB, "{"},
-				{tokenizer.STRING, "key"},
-				{tokenizer.COLON, ":"},
-				{tokenizer.STRING, "value"},
-				{tokenizer.RCUB, "}"},
+				{tokenizer.LCUB, "{", 0, 1},
+				{tokenizer.STRING, "key", 1, 4},
+				{tokenizer.COLON, ":", 4, 5},
+				{tokenizer.STRING, "value", 5, 11},
+				{tokenizer.RCUB, "}", 11, 12},
 			},
 			NewNode(
 				JSON,
@@ -93,6 +97,7 @@ func TestParser_Parse(t *testing.T) {
 																	{
 																		tokenizer.STRING,
 																		"value",
+																		5, 11,
 																	},
 																},
 																nil,
@@ -105,47 +110,47 @@ func TestParser_Parse(t *testing.T) {
 		{
 			name: "kv string 2 pairs",
 			in: []tokenizer.Token{
-				{tokenizer.LCUB, "{"},
-				{tokenizer.STRING, "key1"},
-				{tokenizer.COLON, ":"},
-				{tokenizer.STRING, "value1"},
-				{tokenizer.COMMA, ","},
-				{tokenizer.STRING, "key2"},
-				{tokenizer.COLON, ":"},
-				{tokenizer.STRING, "value2"},
-				{tokenizer.RCUB, "}"},
+				{tokenizer.LCUB, "{", 0, 1},
+				{tokenizer.STRING, "key1", 1, 5},
+				{tokenizer.COLON, ":", 5, 6},
+				{tokenizer.STRING, "value1", 6, 12},
+				{tokenizer.COMMA, ",", 12, 13},
+				{tokenizer.STRING, "key2", 13, 17},
+				{tokenizer.COLON, ":", 17, 18},
+				{tokenizer.STRING, "value2", 18, 24},
+				{tokenizer.RCUB, "}", 24, 25},
 			},
 			expect: NewJsonElemValNode(NewChildren(NewNode(OBJECT, "", nil, NewChildren(
 				NewNode(MEMBERS, "", nil, NewChildren(
 					NewNode(MEMBER, "key1", nil, NewChildren(
-						NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "value1"}))),
+						NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "value1", S: 6, E: 12}))),
 					NewNode(MEMBER, "key2", nil, NewChildren(
-						NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "value2"}))),
+						NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "value2", S: 18, E: 24}))),
 				)),
 			)))),
 		},
 		{
 			name: "array: string, number, true, false, null",
 			in: []tokenizer.Token{
-				{tokenizer.LSQB, "["},
-				{tokenizer.STRING, "string"},
-				{tokenizer.COMMA, ","},
-				{tokenizer.NUMBER, "123"},
-				{tokenizer.COMMA, ","},
-				{tokenizer.KEYWORD, "true"},
-				{tokenizer.COMMA, ","},
-				{tokenizer.KEYWORD, "false"},
-				{tokenizer.COMMA, ","},
-				{tokenizer.KEYWORD, "null"},
-				{tokenizer.RSQB, "]"},
+				{tokenizer.LSQB, "[", 0, 1},
+				{tokenizer.STRING, "string", 1, 7},
+				{tokenizer.COMMA, ",", 7, 8},
+				{tokenizer.NUMBER, "123", 8, 11},
+				{tokenizer.COMMA, ",", 11, 12},
+				{tokenizer.KEYWORD, "true", 12, 16},
+				{tokenizer.COMMA, ",", 16, 17},
+				{tokenizer.KEYWORD, "false", 17, 22},
+				{tokenizer.COMMA, ",", 22, 23},
+				{tokenizer.KEYWORD, "null", 23, 27},
+				{tokenizer.RSQB, "]", 27, 28},
 			},
 			expect: NewJsonElemValNode(NewChildren(NewNode(ARRAY, "", nil, NewChildren(
 				NewNode(ELEMENTS, "", nil, NewChildren(
-					NewElemValString(tokenizer.Token{Kind: tokenizer.STRING, Raw: "string"}),
-					NewElemValNumber(tokenizer.Token{Kind: tokenizer.NUMBER, Raw: "123"}),
-					NewElemValTrue(tokenizer.Token{Kind: tokenizer.KEYWORD, Raw: "true"}),
-					NewElemValFalse(tokenizer.Token{Kind: tokenizer.KEYWORD, Raw: "false"}),
-					NewElemValNull(tokenizer.Token{Kind: tokenizer.KEYWORD, Raw: "null"}),
+					NewElemValString(tokenizer.Token{tokenizer.STRING, "string", 1, 7}),
+					NewElemValNumber(tokenizer.Token{tokenizer.NUMBER, "123", 8, 11}),
+					NewElemValTrue(tokenizer.Token{tokenizer.KEYWORD, "true", 12, 16}),
+					NewElemValFalse(tokenizer.Token{tokenizer.KEYWORD, "false", 17, 22}),
+					NewElemValNull(tokenizer.Token{tokenizer.KEYWORD, "null", 23, 27}),
 				)),
 			)))),
 		},

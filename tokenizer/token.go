@@ -5,17 +5,17 @@ import "fmt"
 type Token struct {
 	Kind
 	Raw string
-	s   int
-	e   int
+	S   int
+	E   int
 }
 
 func (t Token) String() string {
-	// position s:e, s<=...<e, like python
+	// position S:E, S<=...<E, like python
 	var position string
-	if t.e-t.s == 1 {
-		position = fmt.Sprintf("%v", t.s)
+	if t.E-t.S == 1 {
+		position = fmt.Sprintf("%v", t.S)
 	} else {
-		position = fmt.Sprintf("%v:%v", t.s, t.e)
+		position = fmt.Sprintf("%v:%v", t.S, t.E)
 	}
 	return fmt.Sprintf("Token[%v]\t{ Kind: %v,\tRaw: `%v` }", position, t.Kind.String(), t.Raw)
 }

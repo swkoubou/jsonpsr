@@ -137,7 +137,7 @@ func TestTokenizer_Tokenize(t *testing.T) {
 	tk := NewTokenizer()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if actual := tk.Tokenize(tt.in); !assert.Equal(t, tt.expect, actual) {
+			if actual, err := tk.Tokenize(tt.in); !assert.Equal(t, tt.expect, actual) || err != nil {
 				t.Errorf("expected=%v, but actual=%v", tt.expect, actual)
 			}
 		})
@@ -161,7 +161,10 @@ func TestToken_String(t *testing.T) {
 	tk := NewTokenizer()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := tk.Tokenize(tt.in)
+			actual, err := tk.Tokenize(tt.in)
+			if err != nil {
+				t.Fatal(err)
+			}
 			assert.Equal(t, len(tt.expect), len(actual))
 			for i, str := range tt.expect {
 				if !assert.Equal(t, str, actual[i].String()) {
@@ -192,7 +195,10 @@ func TestTokenizer_Tokenize_2(t *testing.T) {
 	tk := NewTokenizer()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tokens := tk.Tokenize(tt.in)
+			tokens, err := tk.Tokenize(tt.in)
+			if err != nil {
+				t.Fatal(err)
+			}
 			for _, tok := range tokens {
 				fmt.Println(tok.String())
 			}

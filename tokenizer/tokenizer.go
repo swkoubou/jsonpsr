@@ -165,7 +165,7 @@ func (t *Tokenizer) consumeWhiteSpace() Token {
 	}
 }
 
-func (t *Tokenizer) Tokenize(in string) []Token {
+func (t *Tokenizer) Tokenize(in string) ([]Token, error) {
 	t.input = []rune(in)
 	t.pos = 0
 
@@ -230,5 +230,5 @@ func (t *Tokenizer) Tokenize(in string) []Token {
 			result = append(result, tok)
 		}
 	}
-	return result
+	return result, nil
 }
